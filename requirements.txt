@@ -1,0 +1,7 @@
+outline-vpn-api
+python-decouple
+SQLAlchemy
+pyTelegramBotAPI
+loguru
+pytz
+PyYAML
