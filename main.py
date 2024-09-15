@@ -31,7 +31,7 @@ def load_texts(file_path):
 texts = load_texts('texts.yaml')
 
 # Список с текстами для кнопок меню
-menu_buttons = ['📖 Инструкция', '🔑 Ключи', '💬 Поддержка', 'ℹ️ Инфо']
+menu_buttons = ['ℹ️ Инфо', '🔑 Ключи', '💬 Поддержка', '📖 Инструкция']
 
 
 def keyboard_create(buttons: list[str]) -> ReplyKeyboardMarkup:
@@ -62,7 +62,10 @@ def start(message):
         bot.send_message(message.chat.id, texts['welcome_message'], parse_mode='Markdown')
         bot.send_message(message.chat.id, texts['menu'], reply_markup=markup, parse_mode='Markdown')
     else:
-        bot.send_message(message.chat.id, 'ага да.', reply_markup=markup, parse_mode='Markdown')
+        bot.send_message(message.chat.id, f'*Привет, {message.from_user.first_name}!*\n'
+                                          'Чем могу быть полезен сегодня?', reply_markup=markup,
+                         parse_mode='Markdown')
+        bot.send_message(message.chat.id, texts['menu'], reply_markup=markup, parse_mode='Markdown')
 
 
 @bot.message_handler(commands=['menu'])
@@ -73,7 +76,7 @@ def menu(message):
 
 @bot.message_handler(func=lambda message: message.text == "📖 Инструкция")
 def instruction(message):
-    bot.send_message(message.chat.id, "Инструкция по настройке и бла бла бла...")
+    bot.send_message(message.chat.id, texts['guide_1'], parse_mode='Markdown', disable_web_page_preview=True)
 
 
 @bot.message_handler(func=lambda message: message.text == "🔑 Ключи")
@@ -97,7 +100,7 @@ def support(message):
 
 @bot.message_handler(func=lambda message: message.text == "ℹ️ Инфо")
 def info(message):
-    bot.send_message(message.chat.id, "инфо")
+    bot.send_message(message.chat.id, '🕸️ Пока пусто...')
 
 
 if __name__ == '__main__':
