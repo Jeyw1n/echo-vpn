@@ -1,3 +1,6 @@
+from datetime import datetime, timedelta
+import sys
+
 import telebot
 from telebot import types
 from telebot.types import ReplyKeyboardMarkup
@@ -6,9 +9,8 @@ from loguru import logger
 from decouple import config, UndefinedValueError
 import yaml
 
-import sys
-
 from database import database as db
+import utils
 
 try:
     API_TOKEN = config('BOT_TOKEN')
@@ -45,10 +47,18 @@ def keyboard_create(buttons: list[str]) -> ReplyKeyboardMarkup:
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    # Сохраняем пользователя в базу данных
-    db_save_result = db.add_user(message.from_user.id)
+    user_id = message.from_user.id
+    # Сохраняем пользователя в базу данных, если его еще там нет.
+    # Сохраняем это в db_save_result (True - сохранился, False - уже есть в БД)
+    db_save_result = db.add_user(user_id)
+    # Меню-клавиатура
     markup = keyboard_create(menu_buttons)
-    if db_save_result or True:
+
+    if db_save_result:
+        # Если пользователь новый, то даём 10ти дневный доступ.
+        expiration_date = datetime.now() + timedelta(days=10)
+        db.add_key(user_id, expiration_date)
+
         bot.send_message(message.chat.id, texts['welcome_message'], parse_mode='Markdown')
         bot.send_message(message.chat.id, texts['menu'], reply_markup=markup, parse_mode='Markdown')
     else:
@@ -68,7 +78,16 @@ def instruction(message):
 
 @bot.message_handler(func=lambda message: message.text == "🔑 Ключи")
 def show_keys(message):
-    bot.send_message(message.chat.id, "Ключи и оплата бла бла бла...")
+    keys = db.get_user_keys(message.from_user.id)
+    if not keys:
+        bot.send_message(message.chat.id, "Пока ключей нет =(")
+    for key in keys:
+        remaining_time = db.get_remaining_time(key.key_id)
+        formated_time = utils.format_remaining_time(remaining_time)
+        bot.send_message(message.chat.id, "*Сервер:* VendekVPN ► Netherlands 🇳🇱\n\n"
+                                          f"Ваш ключ: _#{key.key_id}_\n"
+                                          f"Истекает через: _{formated_time}_"
+                                          f"```{key.access_url + texts['connection_name']}```", parse_mode='Markdown')
 
 
 @bot.message_handler(func=lambda message: message.text == "💬 Поддержка")

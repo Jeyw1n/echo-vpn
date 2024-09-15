@@ -11,8 +11,8 @@ def get_keys():
     return client.get_keys()
 
 
-def create_new_key(name: str):
-    return client.create_key(name=name)
+def create_new_key():
+    return client.create_key()
 # OutlineKey(key_id='3', name='Test', password='SFpjlnMy5OldOOTsR8CAVs', port=48430, method='chacha20-ietf-poly1305',
 # access_url='ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpTRnBqbG5NeTVPbGRPT1RzUjhDQVZz@147.45.232.123:48430/?outline=1',
 # used_bytes=0, data_limit=None)
