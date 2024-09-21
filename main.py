@@ -9,7 +9,7 @@ from loguru import logger
 from decouple import config, UndefinedValueError
 import yaml
 
-from database import database as db
+import database as db
 import utils
 
 try:
@@ -78,11 +78,14 @@ def menu(message):
 def instruction(message):
     bot.send_message(message.chat.id, texts['guide_1'], parse_mode='Markdown', disable_web_page_preview=True)
     with open('media/guide_2.png', 'rb') as guide_2:
-        bot.send_photo(message.chat.id, photo=guide_2, caption=texts['guide_2'], parse_mode='Markdown', show_caption_above_media=True)
+        bot.send_photo(message.chat.id, photo=guide_2, caption=texts['guide_2'], parse_mode='Markdown',
+                       show_caption_above_media=True)
     with open('media/guide_3.png', 'rb') as guide_3:
-        bot.send_photo(message.chat.id, photo=guide_3, caption=texts['guide_3'], parse_mode='Markdown', show_caption_above_media=True)
+        bot.send_photo(message.chat.id, photo=guide_3, caption=texts['guide_3'], parse_mode='Markdown',
+                       show_caption_above_media=True)
     with open('media/guide_4.png', 'rb') as guide_4:
-        bot.send_photo(message.chat.id, photo=guide_4, caption=texts['guide_4'], parse_mode='Markdown', show_caption_above_media=True)
+        bot.send_photo(message.chat.id, photo=guide_4, caption=texts['guide_4'], parse_mode='Markdown',
+                       show_caption_above_media=True)
 
 
 @bot.message_handler(func=lambda message: message.text == "🔑 Ключи")
@@ -107,6 +110,11 @@ def support(message):
 @bot.message_handler(func=lambda message: message.text == "ℹ️ Инфо")
 def info(message):
     bot.send_message(message.chat.id, '🕸️ Пока пусто...')
+
+
+@bot.message_handler(func=lambda message: True)
+def log_message(message):
+    logger.info(f"Сообщение от {message.from_user.username}: {message.text}")
 
 
 if __name__ == '__main__':
