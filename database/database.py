@@ -1,14 +1,16 @@
 from datetime import datetime
+import os
 
 from loguru import logger
 import sqlalchemy as db
 from sqlalchemy.orm import sessionmaker
 
 from .tables import Base, User, Key
-from outline import keymaster
+import keymaster
 
 # Создание движка и соединения
-engine = db.create_engine('sqlite:///sqlite.db', echo=True)
+db_path = os.path.join(os.path.dirname(__file__), 'sqlite.db')
+engine = db.create_engine(f'sqlite:///{db_path}', echo=False)
 connection = engine.connect()
 # Создание таблиц
 Base.metadata.create_all(engine)
