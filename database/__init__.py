@@ -1,1 +1,1 @@
-from .database import add_user, add_key, get_expired_keys, get_user_keys, get_remaining_time
+from .database import add_user, add_key, get_expired_keys, get_user_keys, get_remaining_time, delete_key

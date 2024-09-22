@@ -1,5 +1,6 @@
 from decouple import config
 from outline_vpn.outline_vpn import OutlineVPN
+from loguru import logger
 
 api_url = config('API_URL')
 cert_sha256 = config('CERT_SHA')
@@ -12,7 +13,15 @@ def get_keys():
 
 
 def create_new_key():
-    return client.create_key()
-# OutlineKey(key_id='3', name='Test', password='SFpjlnMy5OldOOTsR8CAVs', port=48430, method='chacha20-ietf-poly1305',
-# access_url='ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpTRnBqbG5NeTVPbGRPT1RzUjhDQVZz@147.45.232.123:48430/?outline=1',
-# used_bytes=0, data_limit=None)
+    new_key = client.create_key()
+    logger.info('Создан ключ:', new_key.key_id)
+    return new_key
+
+
+def delete_key(key_id):
+    result = client.delete_key(key_id)
+    if result:
+        logger.info(f"Ключ {key_id} успешно удален на сервере.")
+    else:
+        logger.warning(f"Ключ {key_id} не удалён на сервере.")
+    return result

@@ -103,3 +103,17 @@ def get_remaining_time(key_id: int) -> int:
         return 0
     finally:
         session.close()
+
+
+def delete_key(key_id: int) -> None:
+    session = Session()
+    try:
+        to_delete = session.query(Key).filter(Key.key_id == key_id).first()
+        session.delete(to_delete)
+        session.commit()
+        logger.info(f"Ключ {key_id} успешно удален в базе данных.")
+    except Exception as e:
+        logger.error(f"Ошибка при получении ключа {key_id}: {e}")
+        session.rollback()
+    finally:
+        session.close()
