@@ -12,6 +12,8 @@ import yaml
 import database as db
 import utils
 
+logger.add("./logs/main.log")
+
 try:
     API_TOKEN = config('BOT_TOKEN')
 except UndefinedValueError:
@@ -31,7 +33,7 @@ def load_texts(file_path):
 texts = load_texts('texts.yaml')
 
 # Список с текстами для кнопок меню
-menu_buttons = ['ℹ️ Инфо', '🔑 Ключи', '💬 Поддержка', '📖 Инструкция']
+menu_buttons = ['ℹ️ Инфо', '🔑 Ключи', '💬 Поддержка', '📖 Инструкция', 'Рефералы 🤝']
 
 
 def keyboard_create(buttons: list[str]) -> ReplyKeyboardMarkup:
@@ -92,7 +94,7 @@ def instruction(message):
 def show_keys(message):
     keys = db.get_user_keys(message.from_user.id)
     if not keys:
-        bot.send_message(message.chat.id, "Пока ключей нет =(")
+        bot.send_message(message.chat.id, "Пока ключей нет...")
     for key in keys:
         remaining_time = db.get_remaining_time(key.key_id)
         formated_time = utils.format_remaining_time(remaining_time)
@@ -104,17 +106,13 @@ def show_keys(message):
 
 @bot.message_handler(func=lambda message: message.text == "💬 Поддержка")
 def support(message):
-    bot.send_message(message.chat.id, texts['support_message'], parse_mode='Markdown')
+    with open('media/support.png', 'rb') as img:
+        bot.send_photo(message.chat.id, photo=img, caption=texts['support_message'], parse_mode='Markdown')
 
 
 @bot.message_handler(func=lambda message: message.text == "ℹ️ Инфо")
 def info(message):
     bot.send_message(message.chat.id, '🕸️ Пока пусто...')
-
-
-@bot.message_handler(func=lambda message: True)
-def log_message(message):
-    logger.info(f"Сообщение от {message.from_user.username}: {message.text}")
 
 
 if __name__ == '__main__':
