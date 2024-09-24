@@ -33,7 +33,7 @@ def load_texts(file_path):
 texts = load_texts('texts.yaml')
 
 # Список с текстами для кнопок меню
-menu_buttons = ['ℹ️ Инфо', '🔑 Ключи', '💬 Поддержка', '📖 Инструкция', 'Рефералы 🤝']
+menu_buttons = ['📖 Инструкция', '🔑 Ключи', 'Рефералы 🤝', '💬 Поддержка', 'ℹ️ Инфо']
 
 
 def keyboard_create(buttons: list[str]) -> ReplyKeyboardMarkup:
@@ -94,7 +94,9 @@ def instruction(message):
 def show_keys(message):
     keys = db.get_user_keys(message.from_user.id)
     if not keys:
-        bot.send_message(message.chat.id, "Пока ключей нет...")
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton("💳 Оплата", callback_data="payment"))
+        bot.send_message(message.chat.id, "У вас нет ключей. Необходимо произвести оплату.", reply_markup=markup)
     for key in keys:
         remaining_time = db.get_remaining_time(key.key_id)
         formated_time = utils.format_remaining_time(remaining_time)
@@ -112,7 +114,53 @@ def support(message):
 
 @bot.message_handler(func=lambda message: message.text == "ℹ️ Инфо")
 def info(message):
-    bot.send_message(message.chat.id, '🕸️ Пока пусто...')
+    bot.send_message(message.chat.id, texts['about'], parse_mode='Markdown')
+
+
+#####################################
+#              ОПЛАТА               #
+#####################################
+
+@bot.callback_query_handler(func=lambda call: call.data == "payment")
+def payment_options(call):
+    markup = types.InlineKeyboardMarkup()
+    markup.add(types.InlineKeyboardButton("1 месяц", callback_data="1_month"),
+               types.InlineKeyboardButton("2 месяца", callback_data="2_month"),
+               types.InlineKeyboardButton("3 месяца", callback_data="3_month"),
+               types.InlineKeyboardButton("↩️ Отмена", callback_data="cancel"))
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+    bot.send_message(call.message.chat.id, "Выберите период оплаты:", reply_markup=markup)
+
+
+@bot.callback_query_handler(func=lambda call: call.data in ["1_month", "2_month", "3_month"])
+def payment_amount(call):
+    months = int(call.data.split('_')[0])  # Получаем количество месяцев
+    amount_options = [(80 * months) * i for i in range(1, 6)]  # Список возможных сумм для оплаты
+    markup = types.InlineKeyboardMarkup(row_width=3)
+
+    for amount in amount_options:
+        markup.add(types.InlineKeyboardButton(f"{amount}₽", callback_data=f"pay_{amount}"))
+
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+    bot.send_message(call.message.chat.id,
+                     f"Вы хотите оплатить {months} месяц(а) доступа? Выберите сумму, которую хотите заплатить. Увеличенная оплата также будет за 1 месяц, просто так вы поддержите разработчика.",
+                     reply_markup=markup)
+
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("pay_"))
+def process_payment(call):
+    amount = int(call.data.split('_')[1])  # Получаем сумму из callback_data
+    # Здесь можно добавить логику для обработки платежа
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+    bot.send_message(call.message.chat.id, f"Вы выбрали оплату на сумму {amount}₽. Спасибо за поддержку!")
+    # После этого можно вернуть пользователя в основное меню или предложить другие действия
+
+
+@bot.callback_query_handler(func=lambda call: call.data == "cancel")
+def cancel_payment(call):
+    markup = keyboard_create(menu_buttons)
+    bot.delete_message(call.message.chat.id, call.message.message_id)
+    bot.send_message(call.message.chat.id, "Оплата отменена. Чем могу помочь еще?", reply_markup=markup)
 
 
 if __name__ == '__main__':
