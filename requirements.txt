@@ -1,6 +1,6 @@
 outline-vpn-api
 python-decouple
 SQLAlchemy
-pyTelegramBotAPI
 loguru
 PyYAML
+aiogram
