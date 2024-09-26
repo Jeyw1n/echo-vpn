@@ -10,4 +10,4 @@ from aiogram.types import (
 def menu_keyboard() -> ReplyKeyboardMarkup:
     buttons_text: list[str] = ['📖 Инструкция', '🔑 Ключи', 'Рефералы 🤝', '💬 Поддержка', 'ℹ️ Инфо']
     buttons_row: list[KeyboardButton] = [KeyboardButton(text=i) for i in buttons_text]
-    return ReplyKeyboardMarkup(keyboard=[buttons_row], resize_keyboard=True)
+    return ReplyKeyboardMarkup(keyboard=[buttons_row[:3], buttons_row[3:]], resize_keyboard=True)
