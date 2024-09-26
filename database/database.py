@@ -19,7 +19,8 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(engine)
 
 
-def add_user(telegram_id: str) -> bool:
+def add_user(telegram_id: int) -> bool:
+    telegram_id = str(telegram_id)
     # Создание сессии
     session = Session()
     try:
@@ -76,7 +77,9 @@ def get_expired_keys() -> list:
         session.close()
 
 
-def get_user_keys(telegram_id: str) -> list:
+def get_user_keys(telegram_id: int) -> list:
+    telegram_id = str(telegram_id)
+
     session = Session()
     try:
         return session.query(Key).filter(Key.telegram_id == telegram_id).all()
