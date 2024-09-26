@@ -19,22 +19,37 @@ Base.metadata.create_all(engine)
 Session = sessionmaker(engine)
 
 
-def add_user(telegram_id: int) -> bool:
+def user_exists(telegram_id: int) -> bool:
+    """Проверяет, существует ли пользователь с данным telegram_id."""
     telegram_id = str(telegram_id)
-    # Создание сессии
     session = Session()
     try:
-        # Выполнение запроса для проверки существования записи с этим telegram_id
         exists = session.query(User).filter(User.telegram_id == telegram_id).first() is not None
-        if not exists:
-            # Добавляем нового пользователя в таблицу
-            session.add(User(telegram_id))
-            session.commit()
-            logger.info(f'Новый пользователь с telegram_id: {telegram_id} - успешно добавлен')
-            return True
-        return False
+        return exists
     except Exception as e:
-        logger.error(f"Ошибка при проверке telegram_id: {e}")
+        logger.error(f"Ошибка при проверке существования пользователя с telegram_id {telegram_id}: {e}")
+        return False
+    finally:
+        session.close()
+
+
+def add_user(telegram_id: int, invited_by: str = None) -> bool:
+    """Добавляет пользователя в таблицу Users"""
+    telegram_id = str(telegram_id)
+    session = Session()
+    try:
+        # Добавляем нового пользователя в таблицу
+        if invited_by is None:
+            session.add(User(telegram_id=telegram_id))
+            logger.info(f'Новый пользователь с telegram_id: {telegram_id} - успешно добавлен')
+        else:
+            session.add(User(telegram_id=telegram_id, invited_by=invited_by))
+            logger.info(f'Новый пользователь (telegram_id:{telegram_id}) был приглашен пользователем (telegram_id:{invited_by})')
+        session.commit()
+
+        return True
+    except Exception as e:
+        logger.error(f"Ошибка при добавлении пользователя с telegram_id {telegram_id}: {e}")
         return False
     finally:
         session.close()
@@ -90,20 +105,30 @@ def get_user_keys(telegram_id: int) -> list:
         session.close()
 
 
-def get_remaining_time(key_id: int) -> int:
+def get_remaining_time(key_id: int) -> str:
     session = Session()
     try:
         key = session.query(Key).filter(Key.key_id == key_id).first()
         now = datetime.now()
+
+        if key is None:
+            logger.error(f"Ключ с ID {key_id} не найден.")
+            return "Ключ не найден."
+
         remaining_time = key.expiry_date - now
+
         # Проверяем, не истек ли срок действия
         if remaining_time.total_seconds() > 0:
-            return remaining_time
+            days, remainder = divmod(remaining_time.total_seconds(), 86400)  # 86400 секунд в дне
+            hours, remainder = divmod(remainder, 3600)  # 3600 секунд в часе
+            minutes, _ = divmod(remainder, 60)  # 60 секунд в минуте
+
+            return f"{int(days)}д {int(hours)}ч {int(minutes)}м"
         else:
-            return 0
+            return "Срок действия истек."
     except Exception as e:
         logger.error(f"Ошибка при получении оставшегося времени для ключа {key_id}: {e}")
-        return 0
+        return "Ошибка при получении оставшегося времени."
     finally:
         session.close()
 
