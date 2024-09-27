@@ -10,7 +10,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 # Импорт router'ов
 from aiogram_bot.routers import (
     start_router,
-    menu_router
+    menu_router,
+    payment_router
 )
 
 try:
@@ -23,5 +24,8 @@ bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.MAR
 dp = Dispatcher(storage=MemoryStorage())
 
 # Регистрация router'ов
-dp.include_router(start_router)
-dp.include_router(menu_router)
+dp.include_routers(
+    start_router,
+    menu_router,
+    payment_router
+)

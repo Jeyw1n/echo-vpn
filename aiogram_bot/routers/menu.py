@@ -21,10 +21,10 @@ import sys
 
 import database
 
-from aiogram_bot.markups import menu_keyboard
+from aiogram_bot.markups import pay_new_markup, pay_exist_markup
 from aiogram_bot.texts_loader import texts
 
-menu_router = Router()
+menu_router = Router(name=__name__)
 
 photo_2 = FSInputFile('media/guide_2.png')
 photo_3 = FSInputFile('media/guide_3.png')
@@ -51,15 +51,16 @@ async def show_keys(msg: Message) -> None:
     keys_count = len(keys)
     keys_word = 'ключ' if keys_count == 1 else 'ключа' if keys_count < 5 else 'ключей'
     # Если все-таки ключи есть
-    await msg.answer(f'У вас {len(keys)} {keys_word}. 🔑\nВы можете купить еще, просто нажав *\"💳 Новый ключ\"*\n\n'
-                     f'*Текущий список ваших ключей:*')
+    await msg.answer(f'У вас {len(keys)} {keys_word}. 🔑\n*Список всех ваших ключей:*')
     for key in keys:
         remaining_time = database.get_remaining_time(key.key_id)
         # formatted_time = utils.format_remaining_time(remaining_time)
-        await msg.answer(f'*Сервер:* VendekVPN ► Netherlands 🇳🇱\n\n'
+        await msg.answer(f'*Сервер:* VendekVPN ► Netherlands 🇳🇱\n'
                          f'Ваш ключ: _#{key.key_id}_\n'
                          f'Истекает через: _{remaining_time}_'
-                         f'```{key.access_url + texts['connection_name']}```')
+                         f'```{key.access_url + texts['connection_name']}```',
+                         reply_markup=pay_exist_markup(key.key_id))
+    await msg.answer(text='Вы можете купить еще, просто нажав *\"💳 Новый ключ\"*', reply_markup=pay_new_markup())
     return
 
 
