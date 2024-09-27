@@ -1,5 +1,4 @@
 from aiogram.types import (
-    ReplyKeyboardRemove,
     ReplyKeyboardMarkup,
     KeyboardButton,
     InlineKeyboardMarkup,
@@ -17,9 +16,11 @@ def pay_new_markup() -> InlineKeyboardMarkup:
     button = InlineKeyboardButton(text='💳 Новый ключ', callback_data=f'pay_key_new')
     return InlineKeyboardMarkup(inline_keyboard=[[button]])
 
+
 def pay_exist_markup(key: str) -> InlineKeyboardMarkup:
     button = InlineKeyboardButton(text='💳 Продлить', callback_data=f'pay_key_{key}')
     return InlineKeyboardMarkup(inline_keyboard=[[button]])
+
 
 def choose_month_count(key: str) -> InlineKeyboardMarkup:
     one_month = InlineKeyboardButton(text='1 месяц', callback_data=f'month_1_{key}')

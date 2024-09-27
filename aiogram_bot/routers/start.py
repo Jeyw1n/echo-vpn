@@ -24,7 +24,6 @@ start_router = Router(name=__name__)
 
 @start_router.message(Command('start'))
 async def start_command(msg: Message) -> None:
-
     user_id: int = msg.from_user.id
     user_exists: bool = database.user_exists(user_id)
 
@@ -34,7 +33,8 @@ async def start_command(msg: Message) -> None:
         referrer_id = msg.text[7:]
         if referrer_id != '' and referrer_id != str(msg.from_user.id):
             database.add_user(user_id, referrer_id)
-            await msg.bot.send_message(chat_id=referrer_id, text=f'Пользователь @{msg.from_user.username} перешел по вашей ссылке! 🎉')
+            await msg.bot.send_message(chat_id=referrer_id,
+                                       text=f'Пользователь @{msg.from_user.username} перешел по вашей ссылке! 🎉')
         else:
             database.add_user(user_id)
 

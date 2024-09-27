@@ -4,3 +4,5 @@ SQLAlchemy
 loguru
 PyYAML
 aiogram
+yookassa
+Flask

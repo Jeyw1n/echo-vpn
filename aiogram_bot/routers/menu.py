@@ -54,7 +54,6 @@ async def show_keys(msg: Message) -> None:
     await msg.answer(f'У вас {len(keys)} {keys_word}. 🔑\n*Список всех ваших ключей:*')
     for key in keys:
         remaining_time = database.get_remaining_time(key.key_id)
-        # formatted_time = utils.format_remaining_time(remaining_time)
         await msg.answer(f'*Сервер:* VendekVPN ► Netherlands 🇳🇱\n'
                          f'Ваш ключ: _#{key.key_id}_\n'
                          f'Истекает через: _{remaining_time}_'
