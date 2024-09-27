@@ -54,6 +54,17 @@ def add_user(telegram_id: int, invited_by: str = None) -> bool:
     finally:
         session.close()
 
+def key_exists(key_id: int) -> bool:
+    """Проверяет, существует ли переданный ключ."""
+    session = Session()
+    try:
+        exists = session.query(User).filter(Key.key_id == key_id).first() is not None
+        return exists
+    except Exception as e:
+        logger.error(f"Ошибка при проверке существования ключа (key_id:{key_id}): {e}")
+        return False
+    finally:
+        session.close()
 
 def add_key(telegram_id, expiry_date):
     # Создание сессии
