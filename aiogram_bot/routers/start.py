@@ -19,7 +19,7 @@ import sys
 from aiogram_bot.markups import menu_keyboard
 from aiogram_bot.texts_loader import texts
 
-start_router = Router()
+start_router = Router(name=__name__)
 
 
 @start_router.message(Command('start'))
