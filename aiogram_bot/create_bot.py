@@ -1,7 +1,3 @@
-import sys
-from loguru import logger
-from decouple import config, UndefinedValueError
-
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
@@ -13,12 +9,9 @@ from aiogram_bot.routers import (
     menu_router,
     payment_router
 )
+import config as conf
 
-try:
-    API_TOKEN = config('BOT_TOKEN')
-except UndefinedValueError:
-    logger.error('Не удалось обнаружить "BOT_TOKEN"! Проверьте конфигурационный файл.')
-    sys.exit(1)
+API_TOKEN = conf.BOT_TOKEN
 
 bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.MARKDOWN))
 dp = Dispatcher(storage=MemoryStorage())

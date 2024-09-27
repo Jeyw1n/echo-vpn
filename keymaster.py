@@ -1,11 +1,9 @@
 from decouple import config
 from outline_vpn.outline_vpn import OutlineVPN
 from loguru import logger
+import config as conf
 
-api_url = config('API_URL')
-cert_sha256 = config('CERT_SHA')
-
-client = OutlineVPN(api_url=api_url, cert_sha256=cert_sha256)
+client = OutlineVPN(api_url=conf.API_URL, cert_sha256=conf.CERT_SHA)
 
 
 def get_keys():
