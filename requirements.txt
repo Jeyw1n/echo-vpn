@@ -6,3 +6,4 @@ PyYAML
 aiogram
 yookassa
 Flask
+Quart

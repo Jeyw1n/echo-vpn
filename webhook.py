@@ -1,21 +1,34 @@
 from datetime import timedelta, datetime
-
-from flask import Flask, request, jsonify, abort
-import database
+import ipaddress
+from quart import Quart, request, jsonify, abort
 from loguru import logger
-from aiogram_bot.create_bot import bot
+from aiogram import Bot
+
 import config as conf
+import database
 
-app = Flask(__name__)
+logger.add("./logs/webhook.log")
 
+app = Quart(__name__)
+
+def is_trusted_ip(ip):
+    ip_obj = ipaddress.ip_address(ip)
+    for trusted_ip in conf.TRUSTED_IP:
+        if ip_obj in ipaddress.ip_network(trusted_ip):
+            return True
+    return False
+
+API_TOKEN = conf.BOT_TOKEN
+bot = Bot(token=API_TOKEN)
 
 async def handle_successful_payment(payment_id: str):
     """Обрабатывает успешный платеж."""
     # Фильтруем только IP адреса от ЮМани
-    if request.remote_addr not in conf.TRUSTED_IP:
+    if not is_trusted_ip(request.remote_addr):
         return abort(403)
 
     transaction = database.get_transaction(payment_id)
+    logger.debug(transaction)
     if not transaction:
         logger.warning(f"Транзакция с payment_id {payment_id} не найдена.")
         return jsonify({"status": "transaction not found"}), 404
@@ -38,12 +51,12 @@ async def handle_successful_payment(payment_id: str):
             database.add_key(telegram_id, expiration_date)
             success_message = "🎉 Поздравляем! Ваш новый ключ успешно создан! 🎉\n" \
                               f"Срок действия: *{months * 30} дней*."
-            await bot.send_message(chat_id=telegram_id, text=success_message)
+            await bot.send_message(chat_id=telegram_id, text=success_message, parse_mode='Markdown')
         elif database.key_exists(int(key_id)):
             database.extend_key(int(key_id), months * 30)
             success_message = "🔄 Ваш ключ успешно продлен! 🔄\n" \
                               f"Срок действия увеличен на *{months * 30} дней*."
-            await bot.send_message(chat_id=telegram_id, text=success_message)
+            await bot.send_message(chat_id=telegram_id, text=success_message, parse_mode='Markdown')
 
     return jsonify({"status": "success"}), 200
 
@@ -58,12 +71,13 @@ async def delete_message(telegram_id: str, message_id: int):
 
 @app.route('/webhook', methods=['POST'])
 async def notification_webhook():
-    data = request.json
+    data = await request.get_json()
     logger.debug(f"Webhook получил данные: {data}")
 
     # Проверяем, что это событие успешного платежа
     if data.get("event") == "payment.succeeded":
-        payment_id = data.get("id")
+        payment_id = data.get("object").get('id')
+        logger.debug(payment_id)
         return await handle_successful_payment(payment_id)
 
     logger.warning(f"Получено неизвестное событие: {data.get('event')}")
@@ -71,4 +85,4 @@ async def notification_webhook():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=80)
