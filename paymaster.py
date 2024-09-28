@@ -9,10 +9,10 @@ import config as conf
 Configuration.account_id = conf.ACCOUNT_ID
 Configuration.secret_key = conf.SECRET_KEY
 
-response = Webhook.add({
-    "event": "payment.succeeded",
-    "url": conf.WEBHOOK_URL
-})
+# response = Webhook.add({
+#     "event": "payment.succeeded",
+#     "url": conf.WEBHOOK_URL
+# })
 
 def create_payment(amount: float, description: str) -> tuple[str, str]:
     """

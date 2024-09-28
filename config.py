@@ -9,7 +9,7 @@ import sys
 MONTH_PRICE = 80.00
 TEXTS_PATH = 'texts.yaml'
 BOT_URL = 'https://t.me/vendek_vpn_bot'
-WEBHOOK_URL = ''
+
 ADMINS = [361186618]
 
 TRUSTED_IP = ['185.71.76.0/27','185.71.77.0/27','77.75.153.0/25','77.75.156.11','77.75.156.35','77.75.154.128/25','2a02:5180::/32']
