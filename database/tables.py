@@ -1,4 +1,7 @@
 from datetime import datetime
+from enum import unique
+from importlib.metadata import requires
+
 from sqlalchemy import create_engine, ForeignKey, Column, String, Integer, CHAR, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -38,3 +41,22 @@ class Key(Base):
 
     def __repr__(self):
         return f"<Key(key_id={self.key_id}, telegram_id={self.telegram_id}, access_url={self.access_url}, expiry_date={self.expiry_date})>"
+
+
+class Transaction(Base):
+    __tablename__ = 'transaction'
+
+    payment_id = Column('payment_id', String, unique=True)
+    telegram_id = Column('telegram_id', String)
+    message_id = Column('message_id', String)
+    key_id = Column('key_id', String)
+    months = Column('months', Integer)
+    status = Column('status', String)
+
+    def __init__(self, payment_id, telegram_id, message_id, key_id, months, status='Uncompleted'):
+        self.payment_id = payment_id
+        self.telegram_id = telegram_id
+        self.message_id = message_id
+        self.key_id = key_id
+        self.months = months
+        self.status = status

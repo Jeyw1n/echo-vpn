@@ -2,6 +2,7 @@ import asyncio
 from loguru import logger
 from aiogram_bot import bot, dp
 
+logger.add("./logs/main.log")
 
 async def main():
     logger.info("Бот успешно запущен!")

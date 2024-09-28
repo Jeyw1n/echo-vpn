@@ -1,11 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 from loguru import logger
 import sqlalchemy as db
 from sqlalchemy.orm import sessionmaker
 
-from .tables import Base, User, Key
+from .tables import Base, User, Key, Transaction
 import keymaster
 
 # Создание движка и соединения
@@ -157,5 +157,95 @@ def delete_key(key_id: int) -> None:
     except Exception as e:
         logger.error(f"Ошибка при получении ключа {key_id}: {e}")
         session.rollback()
+    finally:
+        session.close()
+
+
+def create_transaction(payment_id: str, telegram_id: str, message_id: str, key_id: str, months: int) -> bool:
+    """Создает новую транзакцию."""
+    session = Session()
+    try:
+        new_transaction = Transaction(payment_id=payment_id, telegram_id=telegram_id, message_id=message_id,
+                                      key_id=key_id, months=months)
+        session.add(new_transaction)
+        session.commit()
+        logger.info(f'Транзакция с payment_id: {payment_id} успешно создана.')
+        return True
+    except Exception as e:
+        logger.error(f"Ошибка при создании транзакции с payment_id {payment_id}: {e}")
+        session.rollback()
+        return False
+    finally:
+        session.close()
+
+
+def mark_transaction_successful(payment_id: str) -> bool:
+    """Изменяет статус транзакции на успешный."""
+    session = Session()
+    try:
+        transaction = session.query(Transaction).filter(Transaction.payment_id == payment_id).first()
+        if transaction is None:
+            logger.warning(f"Транзакция с payment_id {payment_id} не найдена.")
+            return False
+
+        transaction.status = 'Successful'
+        session.commit()
+        logger.info(f'Статус транзакции с payment_id: {payment_id} изменен на успешный.')
+        return True
+    except Exception as e:
+        logger.error(f"Ошибка при изменении статуса транзакции с payment_id {payment_id}: {e}")
+        session.rollback()
+        return False
+    finally:
+        session.close()
+
+
+def transaction_exists(payment_id: str) -> bool:
+    """Проверяет существование транзакции"""
+    session = Session()
+    try:
+        transaction = session.query(Transaction).filter(Transaction.payment_id == payment_id).first()
+        if transaction is None:
+            logger.info(f"Транзакция с payment_id {payment_id} не найдена.")
+            return False
+        logger.info(f"Транзакция с payment_id {payment_id} существует")
+        return True
+    except Exception as e:
+        logger.error(f"Ошибка при проверке статуса транзакции с payment_id {payment_id}: {e}")
+        return False
+    finally:
+        session.close()
+
+
+def get_transaction(payment_id: str):
+    """Получает транзакцию по payment_id."""
+    session = Session()
+    try:
+        return session.query(Transaction).filter(Transaction.payment_id == payment_id).first()
+    except Exception as e:
+        logger.error(f"Ошибка при получении транзакции с payment_id {payment_id}: {e}")
+        return None
+    finally:
+        session.close()
+
+
+def extend_key(key_id: int, additional_days: int) -> bool:
+    """Увеличивает срок действия ключа на указанное количество дней."""
+    session = Session()
+    try:
+        key = session.query(Key).filter(Key.key_id == key_id).first()
+        if key is None:
+            logger.error(f"Ключ с ID {key_id} не найден.")
+            return False
+
+        # Увеличиваем срок действия ключа
+        key.expiry_date += timedelta(days=additional_days)
+        session.commit()
+        logger.info(f"Срок действия ключа {key_id} успешно продлен на {additional_days} дней.")
+        return True
+    except Exception as e:
+        logger.error(f"Ошибка при продлении срока действия ключа {key_id}: {e}")
+        session.rollback()
+        return False
     finally:
         session.close()

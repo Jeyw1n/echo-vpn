@@ -58,15 +58,23 @@ async def handle_month_selection(callback_query: CallbackQuery):
     # Рассчитываем сумму платежа
     amount = month * conf.MONTH_PRICE
     description = f'Оплата за {month} {month_word} для ключа {'' if key == 'new' else '#' + key} | VendekNET'
-    # Создаем платеж
+
     try:
-        confirmation_url, payment_id = create_payment(
-            amount=amount,
-            description=description,
-            key_id=key,
+        # Создаем платеж
+        confirmation_url, payment_id = create_payment(amount=amount,description=description)
+
+        # Создаем новую транзакцию в БД
+        transaction_created = database.create_transaction(
+            payment_id=payment_id,
             telegram_id=str(callback_query.from_user.id),
-            message_id=callback_query.message.message_id
+            message_id=str(callback_query.message.message_id),
+            key_id=key,
+            months=month
         )
+        if not transaction_created:
+            await callback_query.answer('Ошибка при создании транзакции!')
+            logger.error(f'Ошибка при создании транзакции {payment_id}')
+            return
 
         await callback_query.answer()
         await callback_query.message.delete()

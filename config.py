@@ -6,9 +6,6 @@ import sys
 #                   Базовый конфиг                  #
 #####################################################
 
-logger.add("logs/main.log")
-logger.add("logs/cron.log")
-
 MONTH_PRICE = 80.00
 TEXTS_PATH = 'texts.yaml'
 BOT_URL = 'https://t.me/vendek_vpn_bot'

@@ -2,6 +2,7 @@ import database as db
 from loguru import logger
 import keymaster
 
+logger.add("./logs/cron.log")
 
 def main():
     expired_keys = db.get_expired_keys()

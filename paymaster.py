@@ -6,21 +6,19 @@ from yookassa import Configuration, Payment, Webhook
 
 import config as conf
 
-Configuration.account_id = ''
-Configuration.secret_key = ''
+Configuration.account_id = conf.ACCOUNT_ID
+Configuration.secret_key = conf.SECRET_KEY
 
-# response = Webhook.add({
-#     "event": "payment.succeeded",
-#     "url": conf.WEBHOOK_URL
+response = Webhook.add({
+    "event": "payment.succeeded",
+    "url": conf.WEBHOOK_URL
+})
 
-def create_payment(amount: float, description: str, key_id: str, telegram_id: str, message_id: int) -> tuple[str, str]:
+def create_payment(amount: float, description: str) -> tuple[str, str]:
     """
     Создает платеж в системе ЮMoney.
-    :param message_id: ID сообщения.
     :param amount: Сумма платежа (в рублях).
     :param description: Описание платежа.
-    :param key_id: ID ключа outline
-    :param telegram_id: ID пользователя телеграм
     :return: Кортеж, содержащий URL для подтверждения платежа и идентификатор платежа.
     """
     try:
@@ -32,11 +30,6 @@ def create_payment(amount: float, description: str, key_id: str, telegram_id: st
             "confirmation": {
                 "type": "redirect",
                 "return_url": conf.BOT_URL
-            },
-            'metadata': {
-                'key_id': key_id,
-                'telegram_id': telegram_id,
-                'message_id': message_id
             },
             "capture": True,
             "description": description
