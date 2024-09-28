@@ -46,7 +46,7 @@ class Key(Base):
 class Transaction(Base):
     __tablename__ = 'transaction'
 
-    payment_id = Column('payment_id', String, unique=True)
+    payment_id = Column('payment_id', String, unique=True, primary_key=True)
     telegram_id = Column('telegram_id', String)
     message_id = Column('message_id', String)
     key_id = Column('key_id', String)
