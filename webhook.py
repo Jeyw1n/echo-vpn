@@ -1,15 +1,20 @@
 from datetime import timedelta, datetime
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 import database
 from loguru import logger
 from aiogram_bot.create_bot import bot
+import config as conf
 
 app = Flask(__name__)
 
 
 async def handle_successful_payment(payment_id: str):
     """Обрабатывает успешный платеж."""
+    # Фильтруем только IP адреса от ЮМани
+    if request.remote_addr not in conf.TRUSTED_IP:
+        return abort(403)
+
     transaction = database.get_transaction(payment_id)
     if not transaction:
         logger.warning(f"Транзакция с payment_id {payment_id} не найдена.")
