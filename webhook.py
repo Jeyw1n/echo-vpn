@@ -1,5 +1,7 @@
 from datetime import timedelta, datetime
+import logging
 import ipaddress
+
 from quart import Quart, request, jsonify, abort
 from loguru import logger
 from aiogram import Bot
@@ -76,10 +78,9 @@ async def handle_successful_payment(payment_id: str):
 @app.before_request
 async def before_request():
     ip = request.headers.get('X-Forwarded-For', request.remote_addr).split(',')[0].strip()
-    logger.debug(f"IP-адрес запроса: {ip}")
 
     if not is_trusted_ip(ip):
-        logger.warning(f"Запрос от недоверенного IP-адреса: {ip}")
+        logger.warning(f"Недоверенный запрос от: {ip} к пути: {request.path}")
         return abort(403)
 
 
