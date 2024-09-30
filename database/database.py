@@ -249,3 +249,16 @@ def extend_key(key_id: int, additional_days: int) -> bool:
         return False
     finally:
         session.close()
+
+
+def get_all_user_keys(telegram_id: str):
+    """Получает количество ключей связанных с telegram_id."""
+    session = Session()
+    try:
+        all_objects = session.query(Key).filter(Key.telegram_id == telegram_id).all()
+        return len(all_objects)
+    except Exception as e:
+        logger.error(f"Ошибка при получении ключей связанных с (telegram_id:{telegram_id}): {e}")
+        return None
+    finally:
+        session.close()
