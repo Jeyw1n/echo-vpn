@@ -43,23 +43,21 @@ async def instruction(msg: Message) -> None:
 @menu_router.message(F.text == '🔑 Ключи')
 async def show_keys(msg: Message) -> None:
     keys = database.get_user_keys(msg.from_user.id)
-    if not keys:
-        # Добавить кнопку "💳 Оплата"
-        await msg.answer('У вас нет ключей. Необходимо произвести оплату.')
-        return
-
-    keys_count = len(keys)
-    keys_word = 'ключ' if keys_count == 1 else 'ключа' if keys_count < 5 else 'ключей'
-    # Если все-таки ключи есть
-    await msg.answer(f'У вас {len(keys)} {keys_word}. 🔑\n*Список всех ваших ключей:*')
-    for key in keys:
-        remaining_time = database.get_remaining_time(key.key_id)
-        await msg.answer(f'*Сервер:* VendekVPN ► Netherlands 🇳🇱\n'
-                         f'Ваш ключ: _#{key.key_id}_\n'
-                         f'Истекает через: _{remaining_time}_'
-                         f'```{key.access_url + texts['connection_name']}```',
-                         reply_markup=pay_exist_markup(key.key_id))
-    await msg.answer(text='Вы можете купить еще, просто нажав *\"💳 Новый ключ\"*', reply_markup=pay_new_markup())
+    # Если ключи есть, то выводим их
+    if keys:
+        keys_count = len(keys)
+        keys_word = 'ключ' if keys_count == 1 else 'ключа' if keys_count < 5 else 'ключей'
+        # Если все-таки ключи есть
+        await msg.answer(f'У вас {len(keys)} {keys_word}. 🔑\n*Список всех ваших ключей:*')
+        for key in keys:
+            remaining_time = database.get_remaining_time(key.key_id)
+            await msg.answer(f'*Сервер:* VendekVPN ► Netherlands 🇳🇱\n'
+                             f'Ваш ключ: _#{key.key_id}_\n'
+                             f'Истекает через: _{remaining_time}_'
+                             f'```{key.access_url + texts['connection_name']}```',
+                             reply_markup=pay_exist_markup(key.key_id))
+    # Кнопка покупки нового ключа
+    await msg.answer(text='Вы можете купить новый ключ:', reply_markup=pay_new_markup())
     return
 
 
@@ -73,7 +71,7 @@ async def info(msg: Message) -> None:
     await msg.answer(texts['about'])
 
 
-@menu_router.message(F.text == 'Рефералы 🤝')
+@menu_router.message(F.text == '🤝 Рефералы')
 async def info(msg: Message) -> None:
     await msg.answer(f'Пока-что в разработке, но ваши приглашения засчитываются.\n'
                      f'Ваша ссылка-приглашение:\nhttps://t.me/vendek\_vpn\_bot/?start={msg.from_user.id}')

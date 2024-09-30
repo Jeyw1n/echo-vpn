@@ -7,13 +7,13 @@ from aiogram.types import (
 
 
 def menu_keyboard() -> ReplyKeyboardMarkup:
-    buttons_text: list[str] = ['📖 Инструкция', '🔑 Ключи', 'Рефералы 🤝', '💬 Поддержка', 'ℹ️ Инфо']
+    buttons_text: list[str] = ['📖 Инструкция', '🔑 Ключи', '🤝 Рефералы', '💬 Поддержка', 'ℹ️ Инфо']
     buttons_row: list[KeyboardButton] = [KeyboardButton(text=i) for i in buttons_text]
     return ReplyKeyboardMarkup(keyboard=[buttons_row[:3], buttons_row[3:]], resize_keyboard=True)
 
 
 def pay_new_markup() -> InlineKeyboardMarkup:
-    button = InlineKeyboardButton(text='💳 Новый ключ', callback_data=f'pay_key_new')
+    button = InlineKeyboardButton(text='🔑 Новый ключ', callback_data=f'pay_key_new')
     return InlineKeyboardMarkup(inline_keyboard=[[button]])
 
 
