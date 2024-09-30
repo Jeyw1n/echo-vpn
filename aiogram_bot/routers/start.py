@@ -33,7 +33,7 @@ async def start_command(msg: Message) -> None:
         referrer_id = msg.text[7:]
         if referrer_id != '' and referrer_id != str(msg.from_user.id):
             database.add_user(user_id, referrer_id)
-            await msg.bot.send_message(chat_id=referrer_id,
+            await msg.bot.send_message(chat_id=int(referrer_id),
                                        text=f'Пользователь @{msg.from_user.username} перешел по вашей ссылке! 🎉')
         else:
             database.add_user(user_id)
@@ -43,8 +43,8 @@ async def start_command(msg: Message) -> None:
         expiration_date = datetime.now() + timedelta(days=10)
         database.add_key(user_id, expiration_date)
 
-        await msg.answer(texts['welcome_message'])
-        await msg.answer(texts['menu'], reply_markup=menu_keyboard())
+        await msg.answer(text=texts['welcome_message'])
+        await msg.answer(text=texts['menu'], reply_markup=menu_keyboard())
 
     else:
         await msg.answer(f'*Привет, {msg.from_user.first_name}!*\nЧем могу быть полезен сегодня?',
