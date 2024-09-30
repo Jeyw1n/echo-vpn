@@ -6,7 +6,7 @@ import sys
 #                   Базовый конфиг                  #
 #####################################################
 
-MONTH_PRICE = 80.00
+MONTH_PRICE = 100.00
 TEXTS_PATH = 'texts.yaml'
 BOT_URL = 'https://t.me/vendek_vpn_bot'
 
