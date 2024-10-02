@@ -41,6 +41,7 @@ async def handle_successful_payment(payment_id: str):
         return jsonify({"status": "transaction not found"}), 404
 
     telegram_id = transaction.telegram_id
+    user = await bot.get_chat(chat_id=telegram_id)
     # message_id = transaction.message_id
     key_id = transaction.key_id
     months = transaction.months
@@ -48,6 +49,17 @@ async def handle_successful_payment(payment_id: str):
     # Обновляем статус транзакции
     if database.mark_transaction_successful(payment_id):
         logger.info(f"Транзакция {payment_id} обновлена на успешный статус.")
+
+        # Сообщение админам
+        for admin_id in conf.ADMINS:
+            await bot.send_message(
+                chat_id=admin_id,
+                text=f'Транзакция ({payment_id}) прошла успешно.\n'
+                f'key_id: {key_id}\n'
+                f'months: {months}\n'
+                f'telegram_id: {telegram_id}\n'
+                f'user: @{user.username}'
+            )
 
         # Удаляем сообщение с указанным message_id
         # await delete_message(telegram_id, message_id)
