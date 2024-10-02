@@ -33,8 +33,11 @@ async def start_command(msg: Message) -> None:
         referrer_id = msg.text[7:]
         if referrer_id != '' and referrer_id != str(msg.from_user.id):
             database.add_user(user_id, referrer_id)
-            await msg.bot.send_message(chat_id=int(referrer_id),
-                                       text=f'Пользователь @{msg.from_user.username} перешел по вашей ссылке! 🎉')
+            try:
+                await msg.bot.send_message(chat_id=int(referrer_id),
+                                       text=f'Пользователь @{msg.from_user.username} перешел по вашей ссылке! 🎉', parse_mode=None)
+            except Exception as ex:
+                logger.error(f'Ошибка отправки сообщения о новом реферале: {ex}')
         else:
             database.add_user(user_id)
 
