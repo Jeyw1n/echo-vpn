@@ -10,7 +10,7 @@ import config as conf
 import database
 
 # Настройка логирования
-logger.add("./logs/webhook.log")
+logger.add("./logs/webhook.log", level='INFO')
 
 app = Quart(__name__)
 

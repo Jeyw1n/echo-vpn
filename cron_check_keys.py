@@ -1,8 +1,15 @@
-import database as db
+from aiogram import Bot
 from loguru import logger
-import keymaster
 
-logger.add("./logs/cron.log")
+import database as db
+import keymaster
+import config as conf
+
+logger.add("./logs/cron.log", level='INFO')
+
+# API_TOKEN = conf.BOT_TOKEN
+# bot = Bot(token=API_TOKEN)
+
 
 def main():
     expired_keys = db.get_expired_keys()
