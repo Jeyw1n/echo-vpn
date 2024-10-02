@@ -32,7 +32,20 @@ def create_payment(amount: float, description: str) -> tuple[str, str]:
                 "return_url": conf.BOT_URL
             },
             "capture": True,
-            "description": description
+            "description": description,
+            # "receipt": {
+            #     "items": [
+            #         {
+            #             "description": description,
+            #             "quantity": 1,
+            #             "amount": {
+            #                 "value": amount,
+            #                 "currency": "RUB"
+            #             },
+            #             "vat_code": 1
+            #         }
+            #     ]
+            # }
         }, uuid.uuid4())
 
         confirmation_url = payment.confirmation.confirmation_url
