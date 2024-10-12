@@ -1,6 +1,4 @@
 import uuid
-import sys
-from decouple import config, UndefinedValueError
 from loguru import logger
 from yookassa import Configuration, Payment, Webhook
 
@@ -9,10 +7,6 @@ import config as conf
 Configuration.account_id = conf.ACCOUNT_ID
 Configuration.secret_key = conf.SECRET_KEY
 
-# response = Webhook.add({
-#     "event": "payment.succeeded",
-#     "url": conf.WEBHOOK_URL
-# })
 
 def create_payment(amount: float, description: str) -> tuple[str, str]:
     """
@@ -32,20 +26,7 @@ def create_payment(amount: float, description: str) -> tuple[str, str]:
                 "return_url": conf.BOT_URL
             },
             "capture": True,
-            "description": description,
-            # "receipt": {
-            #     "items": [
-            #         {
-            #             "description": description,
-            #             "quantity": 1,
-            #             "amount": {
-            #                 "value": amount,
-            #                 "currency": "RUB"
-            #             },
-            #             "vat_code": 1
-            #         }
-            #     ]
-            # }
+            "description": description
         }, uuid.uuid4())
 
         confirmation_url = payment.confirmation.confirmation_url

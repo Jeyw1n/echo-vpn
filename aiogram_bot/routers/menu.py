@@ -1,23 +1,5 @@
 from aiogram import Router, F
-from aiogram.filters import CommandStart, Command
-from aiogram.enums.parse_mode import ParseMode
-from aiogram.types import (
-    Message,
-    ReplyKeyboardRemove,
-    ReplyKeyboardMarkup,
-    KeyboardButton,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton,
-    InputFile,
-    FSInputFile
-)
-
-from loguru import logger
-from decouple import config, UndefinedValueError
-import yaml
-import database
-from datetime import datetime, timedelta
-import sys
+from aiogram.types import Message, FSInputFile
 
 import database
 

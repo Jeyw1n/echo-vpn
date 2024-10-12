@@ -1,4 +1,3 @@
-from decouple import config
 from outline_vpn.outline_vpn import OutlineVPN
 from loguru import logger
 import config as conf

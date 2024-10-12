@@ -1,20 +1,10 @@
-from aiogram import Router, F
-from aiogram.filters import CommandStart, Command
-from aiogram.types import (
-    Message,
-    ReplyKeyboardRemove,
-    ReplyKeyboardMarkup,
-    KeyboardButton,
-    InlineKeyboardMarkup,
-    InlineKeyboardButton
-)
+from aiogram import Router
+from aiogram.filters import Command
+from aiogram.types import Message
 
 from loguru import logger
-from decouple import config, UndefinedValueError
-import yaml
 import database
 from datetime import datetime, timedelta
-import sys
 
 from aiogram_bot.markups import menu_keyboard
 from aiogram_bot.texts_loader import texts
