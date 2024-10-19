@@ -1,3 +1,5 @@
+import urllib.parse
+
 from aiogram import Router, F
 from aiogram.types import Message, FSInputFile
 
@@ -33,10 +35,13 @@ async def show_keys(msg: Message) -> None:
         await msg.answer(f'У вас {len(keys)} {keys_word}. 🔑\n*Список всех ваших ключей:*')
         for key in keys:
             remaining_time = database.get_remaining_time(key.key_id)
-            await msg.answer(f'*Сервер:* VendekVPN ► Netherlands 🇳🇱\n'
+
+            key_end = urllib.parse.quote(texts['connection_name'].format(key.key_id))
+
+            await msg.answer(f'*Сервер:* VendekVPN ► Германия 🇩🇪\n'
                              f'Ваш ключ: _#{key.key_id}_\n'
                              f'Истекает через: _{remaining_time}_'
-                             f'```{key.access_url + texts['connection_name']}```',
+                             f'```{key.access_url + key_end}```',
                              reply_markup=pay_exist_markup(key.key_id))
     # Кнопка покупки нового ключа
     await msg.answer(text='Вы можете купить новый ключ:', reply_markup=pay_new_markup())
