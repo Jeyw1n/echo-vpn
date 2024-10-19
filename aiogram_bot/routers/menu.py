@@ -41,7 +41,7 @@ async def show_keys(msg: Message) -> None:
             await msg.answer(f'*Сервер:* VendekVPN ► Германия 🇩🇪\n'
                              f'Ваш ключ: _#{key.key_id}_\n'
                              f'Истекает через: _{remaining_time}_'
-                             f'```{key.access_url + key_end}```',
+                             f'```{key.access_url + "#" + key_end}```',
                              reply_markup=pay_exist_markup(key.key_id))
     # Кнопка покупки нового ключа
     await msg.answer(text='Вы можете купить новый ключ:', reply_markup=pay_new_markup())
